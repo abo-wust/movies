@@ -5,16 +5,8 @@
 added at 2017-10-6. 添加用户、管理员、电影等各个模型的定义
 '''
 
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-import pymysql
-
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:password@localhost:3306/movie"
-app.config["SQLALCHEMY_TRACK_MODIFICATION"] = True
-
-db = SQLAlchemy(app)
+from app import db
 
 
 # 定义用户信息
@@ -83,11 +75,17 @@ class Admin(db.Model):
 	is_super = db.Column(db.SmallInteger) # 是否为超级管理员
 	role_id = db.Column(db.Integer, db.ForeignKey('role.id'))
 	addtime = db.Column(db.DateTime, index=True, default=datetime.now)
-	adminlogs = db.relationship('Adminlog', backref='amdin') # 定义管理员登录日志的外键关联关系
+	adminlogs = db.relationship('Adminlog', backref='admin') # 定义管理员登录日志的外键关联关系
 	oplogs = db.relationship('Oplog', backref='admin') # 定义管理员操作日志的外键关联关系
 
 	def __repr__(self):
 		return '<Admin {}>'.format(self.name)
+
+
+	# 验证输入密码是否正确
+	def check_pwd(self, pwd):
+		from werkzeug.security import check_password_hash
+		return check_password_hash(self.pwd, pwd)
 
 
 # 管理员登录日志
@@ -186,22 +184,3 @@ class Moviecol(db.Model):
 	def __repr__(self):
 		return "<Moviecol {}>".format(self.id)
 
-
-if __name__ == '__main__':
-	#db.create_all()
-	'''role = Role(
-		name = 'superadmin',
-		auths = ''
-	)
-	
-	db.session.add(role)
-	db.session.commit()'''
-	from werkzeug.security import generate_password_hash
-	admin = Admin(
-			name = 'imoocmovie11',
-			pwd = generate_password_hash('imoocmovie11'),
-			is_super = 0,
-			role_id = 1
-		)
-	db.session.add(admin)
-	db.session.commit()
