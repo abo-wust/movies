@@ -1,4 +1,5 @@
 {% extends "admin/admin.html" %}
+{% import "page/admin_page.html" as pg %}
 
 {% block content %}
 <section class="content-header">
@@ -27,51 +28,45 @@
                     </div>
                 </div>
                 <div class="box-body box-comments">
-                    {% for num in range(1, 6) %}
+                    {% for msg in get_flashed_messages(category_filter=["ok"]) %}
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+                        <h4><i class="icon fa fa-check"></i> 操作成功</h4>
+                        {{ msg }}
+                    </div>
+                    {% endfor %}
+
+                    {% for item in page_data.items %}
                     <div class="box-comment">
-                        <img class="img-circle img-sm"
-                        src="{{ url_for('static', filename='admin/dist/img/user3-128x128.jpg') }}" alt="User Image">
+                        {% if item.user.face %} <!--需要判断数据库中是否有头像，否则会出错-->
+                        <a href="{{ url_for('admin.user_view', id=item.user.id) }}">
+                            <img class="img-circle img-sm" 
+                            src="{{ url_for('static', filename='uploads/users/'+item.user.face) }}" alt="User Image">
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('admin.user_view', id=item.user.id) }}">
+                            <img data-src="holder.js/50x50" style="width:50px;" class="img-responsive center-block" alt="">
+                        </a>
+                        {% endif %}
+
                         <div class="comment-text">
                             <span class="username">
-                                小美
+                                {{ item.user.name }}
                                 <span class="text-muted pull-right">
                                     <i class="fa fa-calendar" aria-hidden="true"></i>
                                     &nbsp;
-                                    2017-01-01 12:00:00
+                                    {{ item.addtime }}
                                 </span>
                             </span>
-                            关于电影<a>《环太平洋》</a>的评论：好看
-                            <br><a class="label label-danger pull-right">删除</a>
+                            关于电影<a>《{{ item.movie.title }}》</a>的评论：{{ item.content }}
+                            <br><a href="{{ url_for('admin.comment_del', id=item.id) }}" class="label label-danger pull-right">删除</a>
                         </div>
                     </div>
-                    <div class="box-comment">
-                        <img class="img-circle img-sm"
-                        src="{{ url_for('static', filename='admin/dist/img/user5-128x128.jpg') }}" alt="User Image">
-                        <div class="comment-text">
-                            <span class="username">
-                                小丽
-                                <span class="text-muted pull-right">
-                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                    &nbsp;
-                                    2017-01-01 12:00:00
-                                </span>
-                            </span>
-                            关于电影<a>《环太平洋》</a>的评论：很好看
-                            <br><a class="label label-danger pull-right">删除</a>
-                        </div>
-                    </div>
+                    
                     {% endfor %}
                 </div>
                 <div class="box-footer clearfix">
-                    <ul class="pagination pagination-sm no-margin pull-right">
-                        <li><a href="#">首页</a></li>
-                        <li><a href="#">上一页</a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">下一页</a></li>
-                        <li><a href="#">尾页</a></li>
-                    </ul>
+                    {{ pg.page(page_data, 'admin.comment_list') }} <!--分页通过导入admin_page.html来显示-->
                 </div>
             </div>
         </div>

@@ -46,7 +46,7 @@ class Auth(db.Model):
 	__tablename__ = 'auth'
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(64), unique=True)
-	url = db.Column(db.String(256), unique=True)
+	url = db.Column(db.String(256), unique=True) # 权限路由规则的地址
 	addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
 	def __repr__(self):

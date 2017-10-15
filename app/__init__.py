@@ -4,14 +4,17 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 import pymysql
+import os
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:password@localhost:3306/movie"
 app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
 app.config["SECRET_KEY"] = 'd4cfac197bc2444c83a4273a524d5827'  #定义csrf保护字段，否则会报错
+app.config['UP_DIR'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/uploads/') # 创建目录用来保存上传的文件和图片
 app.debug = True
 db = SQLAlchemy(app)
 
+print(app.config['UP_DIR'])
 
 from app.home import home as home_blueprint
 from app.admin import admin as admin_blueprint

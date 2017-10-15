@@ -1,4 +1,5 @@
 {% extends "admin/admin.html" %}
+{% import "page/admin_page.html" as pg %}
 
 {% block content %}
 <section class="content-header">
@@ -27,6 +28,13 @@
                     </div>
                 </div>
                 <div class="box-body table-responsive no-padding">
+                    {% for msg in get_flashed_messages(category_filter=["ok"]) %}
+                    <div class="alert alert-success alert-dismissible">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">x</button>
+                        <h4><i class="icon fa fa-check"></i> 操作成功</h4>
+                        {{ msg }}
+                    </div>
+                    {% endfor %}
                     <table class="table table-hover">
                         <tbody>
                             <tr>
@@ -35,15 +43,15 @@
                                 <th>添加时间</th>
                                 <th>操作事项</th>
                             </tr>
-                            {% for num in range(1,11) %}
+                            {% for info in page_data.items %}
                             <tr>
-                                <td>1</td>
-                                <td>科幻</td>
-                                <td>2017-06-01</td>
+                                <td>{{ info.id }}</td>
+                                <td>{{ info.name }}</td>
+                                <td>{{ info.addtime }}</td>
                                 <td>
-                                    <a class="label label-success">编辑</a>
+                                    <a href="{{ url_for('admin.tag_edit', id=info.id) }}" class="label label-success">编辑</a>
                                     &nbsp;
-                                    <a class="label label-danger">删除</a>
+                                    <a href="{{ url_for('admin.tag_del', id=info.id) }}" class="label label-danger">删除</a>
                                 </td>
                             </tr>
                             {% endfor %}
@@ -51,15 +59,7 @@
                     </table>
                 </div>
                 <div class="box-footer clearfix">
-                    <ul class="pagination pagination-sm no-margin pull-right">
-                        <li><a href="#">首页</a></li>
-                        <li><a href="#">上一页</a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">下一页</a></li>
-                        <li><a href="#">尾页</a></li>
-                    </ul>
+                    {{ pg.page(page_data, 'admin.tag_list') }} <!--分页通过导入admin_page.html来显示-->
                 </div>
             </div>
         </div>
@@ -68,38 +68,6 @@
 {% endblock %}
 
 {% block js %}
-<script src="{{ url_for('static', filename='js/echarts.min.js') }}"></script>
-<script>
-    var myChart = echarts.init(document.getElementById('meminfo'));
-    option = {
-        backgroundColor: "white",
-        tooltip: {
-            formatter: "{a} <br/>{b} : {c}%"
-        },
-        toolbox: {
-            feature: {
-                restore: {},
-                saveAsImage: {}
-            }
-        },
-        series: [{
-            name: '内存使用率',
-            type: 'gauge',
-            detail: {
-                formatter: '{value}%'
-            },
-            data: [{
-                value: 50,
-                name: '内存使用率'
-            }]
-        }]
-    };
-    setInterval(function () {
-        option.series[0].data[0].value = (Math.random() * 100).toFixed(2) - 0;
-        myChart.setOption(option, true);
-    },2000);
-
-</script>
 
 <!--在父模板中定义id ，用这段代码来使点击的项目呈选中状态。
 其他项目的html文档同样需要添加该段代码来呈现相同效果（id各不相同）-->
