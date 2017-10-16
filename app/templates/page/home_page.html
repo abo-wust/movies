@@ -1,0 +1,35 @@
+<!--本文档使用macro语法定义分页的模板宏，供其他需要使用分页的html文档引用。
+具体如何实现分页可参照 http://www.pythondoc.com/flask-sqlalchemy/api.html
+-->
+
+{% macro page(data, url) %}
+
+{% if data %}
+<ul class="pagination pagination-sm no-margin pull-right">
+	<li><a href="{{ url_for(url, page=1) }}">首页</a></li>
+
+	{% if data.has_prev %}
+	<li><a href="{{ url_for(url, page=data.prev_num) }}">上一页</a></li>
+	{% else %}
+	<li><a class="disabled" href="#">上一页</a></li>
+	{% endif %}
+	
+	{% for num in data.iter_pages() %}
+		{% if num == data.page %}
+		<li class="active"><a href="#">{{ num }}</a></li>
+		{% else %}
+		<li><a href="{{ url_for(url, page=num) }}">{{ num }}</a></li>
+		{% endif %}
+	{% endfor %}
+
+	{% if data.has_next %}
+	<li><a href="{{ url_for(url, page=data.next_num) }}">下一页</a></li>
+	{% else %}
+	<li><a class="disabled" href="#">下一页</a></li>
+	{% endif %}
+
+	<li><a href="{{ url_for(url, page=data.pages) }}">尾页</a></li>
+</ul>
+{% endif %}
+
+{% endmacro %}

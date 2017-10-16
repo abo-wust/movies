@@ -29,6 +29,12 @@ class User(db.Model):
 		return "<User {}>".format(self.name)
 
 
+	# 验证输入密码是否正确
+	def check_pwd(self, pwd):
+		from werkzeug.security import check_password_hash
+		return check_password_hash(self.pwd, pwd)
+
+
 # 用户登录日志
 class Userlog(db.Model):
 	__tablename__ = 'userlog'

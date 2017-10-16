@@ -11,6 +11,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:password@localhost
 app.config["SQLALCHEMY_TRACK_MODIFICATION"] = False
 app.config["SECRET_KEY"] = 'd4cfac197bc2444c83a4273a524d5827'  #定义csrf保护字段，否则会报错
 app.config['UP_DIR'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/uploads/') # 创建目录用来保存上传的文件和图片
+app.config['FC_DIR'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), "static/uploads/users/") # 会员头像
 app.debug = True
 db = SQLAlchemy(app)
 
