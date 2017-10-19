@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FileField, TextField
+from wtforms import StringField, PasswordField, SubmitField, FileField, TextField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError, EqualTo, Regexp, Email
 from app.models import User
 
@@ -203,7 +203,6 @@ class PwdForm(FlaskForm):
 		render_kw={
 			'class': 'form-control',
 			'placeholder': '请输入旧密码！',
-			#'required': 'required'
 		}
 	)
 	new_pwd = PasswordField(
@@ -227,6 +226,21 @@ class PwdForm(FlaskForm):
 	)
 
 
-
+class CommentForm(FlaskForm):
+	content = TextAreaField(
+		label = '内容',
+		validators = [DataRequired('请输入评论内容！')],
+		description = '内容',
+		render_kw = {
+			'id': 'input_content'
+		}
+	)
+	submit = SubmitField(
+		'提交评论',
+		render_kw={
+			'class': 'btn btn-success',
+			'id': 'btn-sub'
+		}
+	)
 	
 

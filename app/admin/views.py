@@ -189,7 +189,7 @@ def tag_edit(id=None):
 
 @admin.route('/movie/add/', methods=['GET','POST'])
 @admin_login_req
-@admin_auth
+#@admin_auth
 def movie_add():
 	form = MovieForm()
 	if form.validate_on_submit():
@@ -228,9 +228,9 @@ def movie_add():
 	return render_template('admin/movie_add.html', form=form)
 
 
-@admin.route('/movie/list/<int:page>', methods=['GET'])
+@admin.route('/movie/list/<int:page>/', methods=['GET'])
 @admin_login_req
-@admin_auth
+#@admin_auth
 def movie_list(page=None):
 	if page is None:
 		page = 1
