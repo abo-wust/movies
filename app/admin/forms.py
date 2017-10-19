@@ -2,7 +2,7 @@
  # coding: utf-8
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FileField, TextField, SelectField, SelectMultipleField
+from wtforms import StringField, PasswordField, SubmitField, FileField, TextField, SelectField, SelectMultipleField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError, EqualTo
 from app.models import Admin, Tag, Auth, Role
 
@@ -106,7 +106,7 @@ class MovieForm(FlaskForm):
 		validators=[DataRequired('请上传文件！')],
 		description='文件'
 	)
-	info = TextField(
+	info = TextAreaField(
 		label='电影简介',
 		validators=[DataRequired('请输入电影简介！')],
 		description='电影简介',
@@ -192,7 +192,7 @@ class MovieFormEdit(FlaskForm):
 		validators=[DataRequired('请上传文件！')],
 		description='文件'
 	)
-	info = TextField(
+	info = TextAreaField(
 		label='电影简介',
 		validators=[DataRequired('请输入电影简介！')],
 		description='电影简介',
@@ -446,7 +446,6 @@ class AdminForm(FlaskForm):
 	)
 	role_id = SelectField(
 		label = '所属角色',
-		validators = [DataRequired('请选择所属角色！')],
 		coerce=int, 
 		choices=[(v.id, v.name) for v in Role.query.all()],
 		render_kw = {

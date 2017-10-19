@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from . import home
-from flask import render_template, redirect, url_for, flash, request, session
+from flask import render_template, redirect, url_for, flash, request, session, Response
 from app.home.forms import RegistForm, LoginForm, UserProfileForm, PwdForm, CommentForm
 from app.models import User, Userlog, Preview, Tag, Movie, Comment, Moviecol
 from werkzeug.security import generate_password_hash
@@ -11,7 +11,7 @@ from functools import wraps
 import uuid
 import os
 import datetime
-from app import db, app
+from app import db, app, rd
 
 
 # 定义用户访问控制装饰器，可以从flask导入login_required实现相同功能
@@ -306,7 +306,8 @@ def search(page=None):
 		Movie.title.ilike('%' + key + '%')
 	).order_by(
 		Movie.addtime.desc()
-	).paginate(page=page, per_page=5)
+	).paginate(page=page, per_page=10)
+	page_data.key = key # 传入搜索的关键字，在地址栏显示
 	return render_template('home/search.html', movie_count=movie_count, key=key, page_data=page_data)
 
 
@@ -352,4 +353,96 @@ def play(id=None, page=None):
 	db.session.add(movie)
 	db.session.commit()
 	return render_template('home/play.html', movie=movie, form=form, page_data=page_data)
+
+# 弹幕播放器页面，与play页面一样，但是video.html中使用的播放器样式不同
+@home.route('/video/<int:id>/<int:page>/', methods=['GET','POST'])
+def video(id=None, page=None):
+	movie = Movie.query.join(Tag).filter(
+		Tag.id == Movie.tag_id,
+		Movie.id == int(id)
+	).first_or_404()
+
+	if page is None:
+		page = 1
+	page_data = Comment.query.join(
+		Movie
+	).join(
+		User
+	).filter(
+		Movie.id == movie.id,
+		User.id == Comment.user_id
+	).order_by(
+		Comment.addtime.desc()
+	).paginate(page=page, per_page=10)
+
+	movie.playnum = movie.playnum + 1
+
+	# 添加评论
+	form = CommentForm()
+	if 'user' in session and form.validate_on_submit():
+		data = form.data
+		comment = Comment(
+			content = data['content'],
+			movie_id = movie.id,
+			user_id = session['user_id']
+		)
+		db.session.add(comment)
+		db.session.commit()
+		movie.commentnum = movie.commentnum + 1
+		db.session.add(movie)
+		db.session.commit()
+		flash('添加评论成功！', 'ok')
+		return redirect(url_for('home.video', id=movie.id, page=1))
+		
+	db.session.add(movie)
+	db.session.commit()
+	return render_template('home/video.html', movie=movie, form=form, page_data=page_data)
+
+
+# 弹幕处理
+@home.route("/tm/", methods=["GET", "POST"])
+def tm():
+    import json
+    if request.method == "GET":
+        #获取弹幕消息队列
+        id = request.args.get('id')
+        key = "movie" + str(id)
+        if rd.llen(key):
+            msgs = rd.lrange(key, 0, 2999)
+            res = {
+                "code": 1,
+                "danmaku": [json.loads(v.decode('utf-8')) for v in msgs] # 这里需要对输入的弹幕进行解码，否则报Typeerror
+            }
+        else:
+            res = {
+                "code": 1,
+                "danmaku": []
+            }
+        resp = json.dumps(res)
+    if request.method == "POST":
+        #添加弹幕
+        data = json.loads(request.get_data().decode('utf-8')) # 同上，这里也需要对输入的弹幕进行解码，否则报Typeerror
+        msg = {
+            "__v": 0,
+            "author": data["author"],
+            "time": data["time"],
+            "text": data["text"],
+            "color": data["color"],
+            "type": data['type'],
+            "ip": request.remote_addr,
+            "_id": datetime.datetime.now().strftime("%Y%m%d%H%M%S") + uuid.uuid4().hex,
+            "player": [
+                data["player"]
+            ]
+        }
+        res = {
+            "code": 1,
+            "data": msg
+        }
+        resp = json.dumps(res) # 转换为json字符串
+        try:
+        	rd.lpush("movie" + str(data["player"]), json.dumps(msg)) # 将添加的弹幕加入Redis队列
+        except:
+        	print('add into redis line ERROR !')
+    return Response(resp, mimetype='application/json')
 

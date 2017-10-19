@@ -24,7 +24,13 @@
 				<li class="item cl">
 					<a href="user.html">
 						<i class="avatar size-L radius">
+							{% if item.user.face %} <!--需要判断数据库中头像是否存在，否则会出错-->
+							<img alt="50x50" src="{{ url_for('static',filename='uploads/users/' + item.user.face) }}" class="img-circle"
+							style="border:1px solid #abcdef;width:50px;">
+							{% else %}
 							<img alt="50x50" src="holder.js/50x50" class="img-circle" style="border:1px solid #abcdef;">
+							style="border:1px solid #abcdef;width:50px;">
+							{% endif %}
 						</i>
 					</a>
 					<div class="comment-main">

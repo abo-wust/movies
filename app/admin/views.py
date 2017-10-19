@@ -425,6 +425,13 @@ def comment_del(id=None):
 	comment = Comment.query.get_or_404(int(id))
 	db.session.delete(comment)
 	db.session.commit()
+	
+	# 在管理员界面删除一条评论，则对应的movie表中的评论数应该减一
+	movie = Movie.query.get_or_404(comment.movie_id)
+	movie.commentnum = movie.commentnum - 1
+	db.session.add(movie)
+	db.session.commit()
+
 	flash('删除评论成功！', 'ok')
 	return redirect(url_for('admin.comment_list', page=1))
 
