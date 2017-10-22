@@ -1,4 +1,4 @@
-# !/usr/bin/env python
+
 # coding: utf-8
 
 '''
@@ -52,7 +52,7 @@ class Auth(db.Model):
 	__tablename__ = 'auth'
 	id = db.Column(db.Integer, primary_key=True)
 	name = db.Column(db.String(64), unique=True)
-	url = db.Column(db.String(256), unique=True) # 权限路由规则的地址
+	url = db.Column(db.String(255), unique=True) # 权限路由规则的地址
 	addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
 	def __repr__(self):
@@ -136,9 +136,9 @@ class Movie(db.Model):
 	__tablename__ = "movie"
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(64), unique=True) # 标题
-	url = db.Column(db.String(256), unique=True) # 电影播放地址
+	url = db.Column(db.String(255), unique=True) # 电影播放地址
 	info = db.Column(db.Text()) # 电影简介	
-	logo = db.Column(db.String(256), unique=True) # 电影封面
+	logo = db.Column(db.String(255), unique=True) # 电影封面
 	star = db.Column(db.SmallInteger) # 评分
 	playnum = db.Column(db.BigInteger) # 播放量
 	commentnum = db.Column(db.BigInteger) # 评论量
@@ -159,7 +159,7 @@ class Preview(db.Model):
 	__tablename__ = "preview"
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(64), unique=True)
-	logo = db.Column(db.String(256), unique=True)
+	logo = db.Column(db.String(255), unique=True)
 	addtime = db.Column(db.DateTime, index=True, default=datetime.now)
 
 	def __repr__(self):
