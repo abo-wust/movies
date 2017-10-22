@@ -14,7 +14,7 @@ app.config["SECRET_KEY"] = 'd4cfac197bc2444c83a4273a524d5827'  #定义csrf保护
 app.config['REDIS_URL'] = "redis://127.0.0.1:6379/0"  # 定义Redis 路径
 app.config['UP_DIR'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'static/uploads/') # 创建目录用来保存上传的文件和图片
 app.config['FC_DIR'] = os.path.join(os.path.abspath(os.path.dirname(__file__)), "static/uploads/users/") # 会员头像
-app.debug = True
+app.debug = False
 db = SQLAlchemy(app)
 rd = FlaskRedis(app) # 创建Redis 对象
 
