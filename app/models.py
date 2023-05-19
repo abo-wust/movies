@@ -8,6 +8,7 @@ added at 2017-10-6. 添加用户、管理员、电影等各个模型的定义
 from datetime import datetime
 from app import db
 
+#add test git
 
 # 定义用户信息
 class User(db.Model):
